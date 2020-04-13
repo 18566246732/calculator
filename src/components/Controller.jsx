@@ -33,8 +33,8 @@ export default function Controller({
                     })
                 }
                 <div className="controller-symbols__nums-addon row">
-                    <span className="zero brick">0</span>
-                    <span className="brick">.</span>
+                    <span className="zero brick" onClick={() => handleNumClick(0)}>0</span>
+                    <span className="brick" onClick={() => handleNumClick('.')}>.</span>
                 </div>
             </div>
             <div className="controller-operators">
