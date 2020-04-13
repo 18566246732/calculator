@@ -16,6 +16,8 @@ export default class Calculator extends React.Component {
         this.handleOperatorClick = this.handleOperatorClick.bind(this);
         this.reset = this.reset.bind(this);
         this.handleNumClick = this.handleNumClick.bind(this);
+        this.handlePercentage = this.handlePercentage.bind(this);
+        this.handleSymbolChange = this.handleSymbolChange.bind(this);
     }
     reset() {
         this.setState({
@@ -37,25 +39,26 @@ export default class Calculator extends React.Component {
                         result: this.state.currentResult
                     }]),
                     isResultSettled: false,
-                    currentOperandLeft: num.toString(),
+                    currentOperandLeft: num === '.' ? '0.' : num.toString(),
                     currentOperandsRight: [],
                     currentResult: 0,
                 });
                 return;
             }
+            
+            // 只能有一个小数点
+            if (num === '.' && this.state.currentOperandLeft.toString().includes('.')) return;
 
-            if (num === '.') {
-                // 小数点只能有一个
-                if (this.state.currentOperandLeft.toString().includes('.')) {
-                    return;
+            // 小数点和0相遇时
+            let currentOperandLeft = this.state.currentOperandLeft.toString() + num;
+            if (this.state.currentOperandLeft.toString() === '0') {
+                if (num === '.') {
+                    num = '0.';
                 }
-                // 防止重复0
-                if (this.state.currentOperandLeft.toString() !== '0') {
-                    num = '0.'
-                }
+                currentOperandLeft = num; 
             }
             this.setState({
-                currentOperandLeft: this.state.currentOperandLeft + num
+                currentOperandLeft
             })
             setTimeout(() => {
                 this.setState({
@@ -65,18 +68,20 @@ export default class Calculator extends React.Component {
         }
         if (this.state.mode === 'choosingDivisor') {
             const lastOperandsRight = this.state.currentOperandsRight.slice(-1);
-            if (num === '.') {
-                // 小数点只能有一个
-                if (lastOperandsRight[0].operandRight.toString().includes('.')) {
-                    return;
+
+            // 只能有一个小数点
+            if (num === '.' && lastOperandsRight[0].operandRight.toString().includes('.')) return;
+
+            // 小数点和0相遇时
+            let operandRight = lastOperandsRight[0].operandRight.toString() + num;
+            if (lastOperandsRight[0].operandRight.toString() === '') {
+                if (num === '.') {
+                    num = '0.';
                 }
-                // 防止重复0
-                if (lastOperandsRight[0].operandRight.toString() !== '0') {
-                    num = '0.'
-                }
+                operandRight = num; 
             }
             const newLastOperandsRight = [Object.assign(lastOperandsRight[0], {
-                operandRight: lastOperandsRight[0].operandRight + num
+                operandRight
             })];
             const newCurrentOperandsRight = this.state.currentOperandsRight.slice(0, -1).concat(newLastOperandsRight)
             this.setState({
@@ -142,11 +147,51 @@ export default class Calculator extends React.Component {
         }
     }
     countDecimals(value) {
-        console.log(value, 'value');
-        
         value = Number(value);
         if(Math.floor(value) === value) return 0;
         return value.toString().split(".")[1].length || 0; 
+    }
+    handlePercentage() {
+        if (this.state.mode === 'choosingDivident') {
+            this.setState({
+                currentOperandLeft: this.state.currentOperandLeft / 100
+            })
+        }
+        if (this.state.mode === 'choosingDivisor') {
+            const lastOperandsRight = this.state.currentOperandsRight.slice(-1);
+            const newLastOperandsRight = [Object.assign(lastOperandsRight[0], {
+                operandRight: lastOperandsRight[0].operandRight / 100
+            })];
+            this.setState({
+                statecurrentOperandsRight: newLastOperandsRight
+            })
+        }
+        setTimeout(() => {
+            this.setState({
+                currentResult: this.calculateResult(this.state.currentOperandLeft, this.state.currentOperandsRight)
+            })
+        }, 0);
+    }
+    handleSymbolChange() {
+        if (this.state.mode === 'choosingDivident') {
+            this.setState({
+                currentOperandLeft: this.state.currentOperandLeft > 0 ? -this.state.currentOperandLeft : Math.abs(this.state.currentOperandLeft)
+            })
+        }
+        if (this.state.mode === 'choosingDivisor') {
+            const lastOperandsRight = this.state.currentOperandsRight.slice(-1);
+            const newLastOperandsRight = [Object.assign(lastOperandsRight[0], {
+                operandRight: lastOperandsRight[0].operandRight > 0 ? -lastOperandsRight[0].operandRight : Math.abs(lastOperandsRight[0].operandRight)
+            })];
+            this.setState({
+                statecurrentOperandsRight: newLastOperandsRight
+            })
+        }
+        setTimeout(() => {
+            this.setState({
+                currentResult: this.calculateResult(this.state.currentOperandLeft, this.state.currentOperandsRight)
+            })
+        }, 0);
     }
     render() {
         return (
@@ -162,6 +207,8 @@ export default class Calculator extends React.Component {
                 <Controller 
                     reset={this.reset} 
                     handleOperatorClick={this.handleOperatorClick} 
+                    handleSymbolChange={this.handleSymbolChange}
+                    handlePercentage={this.handlePercentage}
                     handleNumClick={this.handleNumClick}>
                 </Controller>
             </div>

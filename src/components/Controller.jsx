@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import "../style/controller.css";
 
 export default function Controller({
     reset,
     handleOperatorClick,
-    handleNumClick
+    handleNumClick,
+    handleSymbolChange,
+    handlePercentage
 }) {
     return (
         <div className="controller">
@@ -14,8 +16,8 @@ export default function Controller({
                         className="brick"
                         onClick={() => reset()}
                     >C</span>
-                    <span className="brick">+/-</span>
-                    <span className="brick">%</span>
+                    <span className="brick" onClick={() => handleSymbolChange()}>+/-</span>
+                    <span className="brick" onClick={() => handlePercentage()}>%</span>
                 </div>
                 {
                     [0,1,2].map((rNum, rIndex) => {
