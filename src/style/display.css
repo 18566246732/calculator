@@ -1,0 +1,38 @@
+.display {
+    background: #2c3e50;
+    height: 300px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    font-size: 24px;
+    padding: 10px;
+    overflow: scroll;
+}
+
+.display-history {
+    border-top: 1px dashed white;
+    width: 100%;
+    text-align: right;
+    padding-top: 5px;
+    margin-top: 5px;
+}
+
+.display-history:first-child {
+    border-top: none;
+}
+
+.current .display-history__result {
+    font-size: 16px;
+    color: #b7abab;
+}
+
+.current .display-history__result.active {
+    font-size: 24px;
+    color: white;
+}
+
+.display-history__operand.right {
+    margin-left: 10px;
+}
